@@ -303,6 +303,14 @@ INDEX_TPL = """<!DOCTYPE html>
     </div>
   </section>
 
+  <section class="dance">
+    <h2>\U0001F57B 每日舞蹈</h2>
+    <div class="dhint">每天换一种舞，刷到就想跟着扭（纯前端动画，零成本，不开电脑也自动换）</div>
+    <div class="stage" id="stage"></div>
+    <div class="dname" id="danceName"></div>
+    <div class="dcap" id="danceCap"></div>
+  </section>
+
   <section class="money">
     <h2>\U0001F4B0 支持一下</h2>
     <div class="mc">
@@ -361,6 +369,24 @@ document.getElementById('lotBtn').onclick=function(){
   document.getElementById('lotDesc').textContent=l.d;
   document.getElementById('lotbox').style.display='block';
 };
+// 每日舞蹈（按天换舞种，纯前端动画）
+(function(){
+  var DANCES=[
+    {n:"机械舞",e:["🤖","🕺","🤖","💃","🕺"],a:"d-shake",c:"今日 BGM：车间进行曲。动起来像被按了开关。"},
+    {n:"摇摆舞",e:["💃","🕺","💃","🕺","🐶"],a:"d-wob",c:"左右摇摆，烦恼跟着甩出去。"},
+    {n:"陀螺舞",e:["🌀","🕺","💃","🌀","🕺"],a:"d-spin",c:"转就完事了，转晕了就不想上班。"},
+    {n:"弹簧舞",e:["🕺","💃","🐰","🕺","💃"],a:"d-jump",c:"一蹦一蹦，像刚发了工资。"},
+    {n:"踢腿舞",e:["🦵","🕺","💃","🕺","🦵"],a:"d-kick",c:"腿都快踢到天花板了，注意安全。"},
+    {n:"抖肩舞",e:["🕺","💃","🐱","🕺","💃"],a:"d-wob",c:"肩膀抖起来，班味瞬间少一半。"},
+    {n:"扭腰舞",e:["💃","🕺","🐻","💃","🕺"],a:"d-kick",c:"腰是借来的，今天必须扭够本。"}
+  ];
+  var d=new Date(); var key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  var r=rngFrom('dance'+key); var dn=DANCES[Math.floor(r()*DANCES.length)];
+  document.getElementById('danceName').textContent='今日舞种：'+dn.n;
+  document.getElementById('danceCap').textContent=dn.c;
+  var st=document.getElementById('stage');
+  dn.e.forEach(function(x,i){var s=document.createElement('span');s.className='dancer '+dn.a;s.textContent=x;s.style.animationDelay=(i*0.12)+'s';st.appendChild(s);});
+})();
 // 填充变现位
 if(SITE_CONFIG.wxQr) document.getElementById('wxbox').innerHTML='<img src="'+SITE_CONFIG.wxQr+'" style="width:160px">';
 if(SITE_CONFIG.afdian) document.getElementById('afdian').innerHTML='<a href="'+SITE_CONFIG.afdian+'" target="_blank">'+SITE_CONFIG.afdian+'</a>';
@@ -434,7 +460,24 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backgr
 .meta{color:#999;font-size:13px;margin-bottom:14px}
 .body{font-size:17px;margin-bottom:20px}
 .back{display:inline-block;background:#ff5c8a;color:#fff;padding:8px 16px;border-radius:20px;text-decoration:none}
-@media(max-width:680px){.play{grid-template-columns:1fr}.money .mc{grid-template-columns:1fr}}
+.dance{background:linear-gradient(120deg,#1b1230,#2a1b4d);border-radius:14px;padding:20px;margin:18px 0;color:#fff;text-align:center}
+.dance h2{color:#fff;margin:0 0 4px}
+.dance .dhint{font-size:12px;color:#cbb8ff;margin-bottom:12px}
+.stage{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;min-height:96px;align-items:flex-end}
+.dancer{font-size:46px;line-height:1;display:inline-block;transform-origin:bottom center}
+.d-kick{animation:kick .9s ease-in-out infinite}
+.d-spin{animation:spin 1.3s linear infinite}
+.d-wob{animation:wob .7s ease-in-out infinite}
+.d-jump{animation:jump .8s ease-in-out infinite}
+.d-shake{animation:shake .5s ease-in-out infinite}
+@keyframes kick{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-14px) rotate(8deg)}}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes wob{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.dance .dname{font-size:18px;font-weight:800;margin-top:14px;color:#ffd86b}
+.dance .dcap{font-size:13px;color:#e7dcff;margin-top:6px;min-height:34px}
+@media(max-width:680px){.play{grid-template-columns:1fr}.money .mc{grid-template-columns:1fr}.dancer{font-size:38px}}
 """
 
 def build(posts):
