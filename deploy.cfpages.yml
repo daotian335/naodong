@@ -1,0 +1,30 @@
+name: 每日胡说 · 自动更新
+on:
+  schedule:
+    - cron: "0 0 * * *"        # UTC 0:00 = 北京时间 08:00，每天自动跑
+  workflow_dispatch:           # 也能在 GitHub 网页手动点一下触发
+permissions:
+  contents: write              # 允许提交 posts.json（累积历史文章）
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 生成今日内容
+        run: python generate.py
+      - name: 提交累积的文章数据
+        run: |
+          git config user.email "bot@naodong.local"
+          git config user.name "naodong-bot"
+          git add posts.json
+          git commit -m "daily: $(date)" || echo "no change"
+          git push || echo "skip"
+      - name: 部署到 Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=naodong --branch=main
