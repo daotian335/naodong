@@ -1,0 +1,6 @@
+# 生成物，由 GitHub Actions / 本地脚本重新生成，不入库
+dist/
+
+# Python 缓存
+__pycache__/
+*.pyc
